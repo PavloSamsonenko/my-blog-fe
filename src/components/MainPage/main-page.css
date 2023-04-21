@@ -1,0 +1,25 @@
+.main-page-body {
+  min-height: calc(100vh - 111px);
+  background-image: url("/public/images/man.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-page-body > div {
+  border-radius: 15px;
+  padding-top: 80px;
+  background-color: rgb(0,0,0,0.5);
+  color:azure;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 64px;
+  line-height: 75px;
+  text-align: center;
+  height: 310px;
+  width: 1030px;
+}
