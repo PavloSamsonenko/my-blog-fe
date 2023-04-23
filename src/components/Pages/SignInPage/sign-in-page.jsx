@@ -1,6 +1,5 @@
-import "./sign-up-page.css";
+import "./sign-in-page.css";
 import * as React from "react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -11,30 +10,28 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useState } from "react";
 
 const theme = createTheme();
 
-export default function SignUp() {
+export default function SignIn() {
   const [errors, setErrors] = useState({
-    emptyEmail: "",
-    emptyUsername: "",
-    emptyPassword: "",
-    passwordMismatch: "",
+    email: "",
+    password: "",
   });
 
   const [data, setData] = useState({
     email: "",
-    username: "",
     password: "",
-    confirmPassword: "",
   });
 
-  const navigate = useNavigate();
+  let navigate = useNavigate();
   const routeChange = (path) => {
     navigate(path);
   };
 
-  const handleLoginRedirect = () => routeChange("/login");
+  const handleRegisterRedirect = () => routeChange("/register");
+  const handleMainPageRedirect = () => routeChange("/");
   const handlePasswordResetRedirect = () => routeChange("/password/reset");
 
   const handleChange = (e) => {
@@ -46,9 +43,31 @@ export default function SignUp() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validateFields()) {
-      return;
+    if (!validateFields()) {
+      fetchSingIn();
     }
+  };
+
+  const fetchSingIn = () => {
+    fetch("http://localhost:8080/a/rest/accounts/login", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ email: data.email, password: data.password }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.authorizationToken) {
+          for (const [key, value] of Object.entries(res.errors)) {
+            setError(`${key}`, value, value);
+          }
+          return;
+        }
+        localStorage.setItem("token", res.authorizationToken);
+        handleMainPageRedirect();
+      });
   };
 
   let error = false;
@@ -57,21 +76,12 @@ export default function SignUp() {
     error = false;
     setErrors((state) => ({
       ...state,
-      emptyEmail: "",
-      emptyUsername: "",
-      emptyPassword: "",
-      passwordMismatch: "",
+      email: "",
+      password: "",
     }));
 
-    setError("emptyEmail", "Email cannot be empty", !data?.email);
-    setError("emptyUsername", "Username cannot be empty", !data?.username);
-    setError("emptyPassword", "Password cannot be empty", !data?.password);
-
-    setError(
-      "passwordMismatch",
-      "Passwords don't match",
-      data.confirmPassword !== data.password
-    );
+    setError("email", "Email cannot be empty", !data?.email);
+    setError("password", "Password cannot be empty", !data?.password);
 
     return error;
   };
@@ -85,7 +95,7 @@ export default function SignUp() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container className="sign-up-main" component="main" maxWidth="xs">
+      <Container className="sign-in-main" component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
@@ -95,7 +105,7 @@ export default function SignUp() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign up
+            Sign in
           </Typography>
           <Box
             component="form"
@@ -106,8 +116,8 @@ export default function SignUp() {
             <TextField
               margin="normal"
               onChange={handleChange}
-              error={Boolean(errors?.emptyEmail)}
-              helperText={errors?.emptyEmail}
+              error={Boolean(errors?.email)}
+              helperText={errors?.email}
               required
               fullWidth
               id="email"
@@ -119,38 +129,15 @@ export default function SignUp() {
             <TextField
               margin="normal"
               onChange={handleChange}
-              error={Boolean(errors?.emptyUsername)}
-              helperText={errors?.emptyUsername}
-              required
-              fullWidth
-              name="username"
-              label="Username"
-              type="username"
-              id="username"
-            />
-            <TextField
-              margin="normal"
-              onChange={handleChange}
-              error={Boolean(errors?.emptyPassword)}
-              helperText={errors?.emptyPassword}
+              error={Boolean(errors?.password)}
+              helperText={errors?.password}
               required
               fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
-            />
-            <TextField
-              margin="normal"
-              onChange={handleChange}
-              required
-              fullWidth
-              error={Boolean(errors?.passwordMismatch)}
-              helperText={errors?.passwordMismatch}
-              name="confirmPassword"
-              label="Confirm password"
-              type="password"
-              id="confirmPassword"
+              autoComplete="current-password"
             />
             <Button
               type="submit"
@@ -158,7 +145,7 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Sign In
             </Button>
             <Grid container>
               <Grid item xs>
@@ -167,8 +154,8 @@ export default function SignUp() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link onClick={handleLoginRedirect} variant="body2">
-                  {"Already have an account? Sign In"}
+                <Link onClick={handleRegisterRedirect} variant="body2">
+                  {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
             </Grid>

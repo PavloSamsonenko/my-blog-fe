@@ -11,10 +11,10 @@ const Header = () => {
   const handleRegisterRedirect = () => routeChange("/register");
   const handleLoginRedirect = () => routeChange("/login");
   const handleMainRedirect = () => routeChange("/");
-  
+
   return (
     <header className="header">
-      <div onClick={handleMainRedirect} style={{cursor:"pointer"}}>
+      <div onClick={handleMainRedirect} style={{ cursor: "pointer" }}>
         <img src="/images/logo_header.png" alt="logo" />
         <p>MyBlog - post whatever, whenever and wherever</p>
       </div>

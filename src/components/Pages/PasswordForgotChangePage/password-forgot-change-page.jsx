@@ -1,28 +1,31 @@
-import "./sign-in-page.css";
+import "./password-forgot-change-page.css";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { useParams } from "react-router";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const theme = createTheme();
 
-export default function SignIn() {
+export default function PasswordForgotChangePage() {
+  const params = useParams();
+
   const [errors, setErrors] = useState({
-    emptyEmail: "",
-    emptyPassword: "",
+    token: "",
+    password: "",
+    passwordMismatch: "",
   });
 
   const [data, setData] = useState({
-    email: "",
     password: "",
+    confirmPassword: "",
   });
 
   let navigate = useNavigate();
@@ -30,8 +33,7 @@ export default function SignIn() {
     navigate(path);
   };
 
-  const handleRegisterRedirect = () => routeChange("/register");
-  const handlePasswordResetRedirect = () => routeChange("/password/reset");
+  const handleLoginRedirect = () => routeChange("/login");
 
   const handleChange = (e) => {
     setData({
@@ -42,9 +44,41 @@ export default function SignIn() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validateFields()) {
-      return;
+    if (!validateFields()) {
+      fetchAccountForgetPassword();
+      handleLoginRedirect();
     }
+  };
+
+  const fetchAccountForgetPassword = () => {
+    fetch(
+      `http://localhost:8080/a/rest/accounts/password/forgot/change/${params.passwordResetToken}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ newPassword: data.password }),
+      }
+    )
+      .then((res) => res.text())
+      .then((text) => {
+        if (text.length) {
+          for (const [key, value] of Object.entries(JSON.parse(text).errors)) {
+            if (key === "token") {
+              toast(value, {
+                progressClassName: "red-progress",
+              });
+            } else {
+              setError(`${key}`, value, value);
+            }
+            return;
+          }
+        } else {
+          toast(`Password changed succesfully`);
+        }
+      });
   };
 
   let error = false;
@@ -53,12 +87,17 @@ export default function SignIn() {
     error = false;
     setErrors((state) => ({
       ...state,
-      emptyEmail: "",
-      emptyPassword: "",
+      password: "",
+      passwordMismatch: "",
     }));
 
-    setError("emptyEmail", "Email cannot be empty", !data?.email);
-    setError("emptyPassword", "Password cannot be empty", !data?.password);
+    setError("password", "Password cannot be empty", !data?.password);
+
+    setError(
+      "passwordMismatch",
+      "Passwords don't match",
+      data.confirmPassword !== data.password
+    );
 
     return error;
   };
@@ -72,7 +111,11 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container className="sign-in-main" component="main" maxWidth="xs">
+      <Container
+        className="password-forgot-change-main"
+        component="main"
+        maxWidth="xs"
+      >
         <CssBaseline />
         <Box
           sx={{
@@ -82,7 +125,7 @@ export default function SignIn() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign in
+            Change your password
           </Typography>
           <Box
             component="form"
@@ -93,28 +136,26 @@ export default function SignIn() {
             <TextField
               margin="normal"
               onChange={handleChange}
-              error={Boolean(errors?.emptyEmail)}
-              helperText={errors?.emptyEmail}
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              onChange={handleChange}
-              error={Boolean(errors?.emptyPassword)}
-              helperText={errors?.emptyPassword}
+              error={Boolean(errors?.password)}
+              helperText={errors?.password}
               required
               fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
+            />
+            <TextField
+              margin="normal"
+              onChange={handleChange}
+              required
+              fullWidth
+              error={Boolean(errors?.passwordMismatch)}
+              helperText={errors?.passwordMismatch}
+              name="confirmPassword"
+              label="Confirm password"
+              type="password"
+              id="confirmPassword"
             />
             <Button
               type="submit"
@@ -122,20 +163,8 @@ export default function SignIn() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              change password
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link onClick={handlePasswordResetRedirect} variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link onClick={handleRegisterRedirect} variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>

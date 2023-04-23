@@ -1,4 +1,4 @@
-import "./password-reset.css";
+import "./password-reset-page.css";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -11,12 +11,13 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const theme = createTheme();
 
 export default function ResetPassword() {
   const [errors, setErrors] = useState({
-    emptyEmail: "",
+    email: "",
   });
 
   const [data, setData] = useState({
@@ -36,13 +37,38 @@ export default function ResetPassword() {
       ...data,
       [e.target.name]: e.target.value,
     });
+    console.log(data);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validateFields()) {
-      return;
+    if (!validateFields()) {
+      fetchAccountForgetPassword();
     }
+  };
+
+  const fetchAccountForgetPassword = () => {
+    fetch(`http://localhost:8080/a/rest/accounts/password/forgot`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ email: data.email }),
+    })
+      .then((res) => res.text())
+      .then((text) => {
+        console.log(text);
+        if (text.length) {
+          for (const [key, value] of Object.entries(JSON.parse(text).errors)) {
+            setError(`${key}`, value, value);
+            return;
+          }
+        } else {
+          toast(`Please check your email for next step`);
+          handleLoginRedirect();
+        }
+      });
   };
 
   let error = false;
@@ -51,10 +77,10 @@ export default function ResetPassword() {
     error = false;
     setErrors((state) => ({
       ...state,
-      emptyEmail: "",
+      email: "",
     }));
 
-    setError("emptyEmail", "Email cannot be empty", !data?.email);
+    setError("email", "Email cannot be empty", !data?.email);
 
     return error;
   };
@@ -89,12 +115,12 @@ export default function ResetPassword() {
             <TextField
               margin="normal"
               onChange={handleChange}
-              error={Boolean(errors?.emptyEmail)}
-              helperText={errors?.emptyEmail}
+              error={Boolean(errors?.email)}
+              helperText={errors?.email}
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Enter your email Address"
               name="email"
               autoComplete="email"
               autoFocus
@@ -105,7 +131,7 @@ export default function ResetPassword() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Reset password
+              change password
             </Button>
             <Grid container>
               <Grid item xs>
