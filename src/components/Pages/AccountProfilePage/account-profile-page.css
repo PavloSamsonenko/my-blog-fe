@@ -1,0 +1,19 @@
+.account-profile-page-main {
+  min-height: calc(100vh - 111px);
+  padding-top: 100px;
+  box-sizing: border-box;
+}
+
+.username {
+  width: 3000 !important;
+}
+
+.account-profile-page-main p {
+  margin-bottom: 20px;
+  font-size: 30px;
+}
+
+.account-profile-page-main img {
+  width: 300px;
+  margin-bottom: 40px;
+}

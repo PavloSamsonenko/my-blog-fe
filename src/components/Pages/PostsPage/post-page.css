@@ -1,0 +1,8 @@
+.posts-page-main {
+  min-height: calc(100vh - 111px);
+}
+.post-card {
+  margin: 0 10px 25px;
+  width: 400px !important;
+  height: 220px !important;
+}

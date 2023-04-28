@@ -11,6 +11,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { toast } from "react-toastify";
 
 const theme = createTheme();
 
@@ -73,6 +74,7 @@ export default function SignUp() {
           return;
         }
         localStorage.setItem("token", res.authorizationToken);
+        toast(`Account registration complete, please activate it via email instruction`);
         handleLoginRedirect();
       });
   };

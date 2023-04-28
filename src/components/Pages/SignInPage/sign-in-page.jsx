@@ -31,7 +31,7 @@ export default function SignIn() {
   };
 
   const handleRegisterRedirect = () => routeChange("/register");
-  const handleMainPageRedirect = () => routeChange("/");
+  const handlePostPageRedirect = () => routeChange("/posts");
   const handlePasswordResetRedirect = () => routeChange("/password/reset");
 
   const handleChange = (e) => {
@@ -66,7 +66,7 @@ export default function SignIn() {
           return;
         }
         localStorage.setItem("token", res.authorizationToken);
-        handleMainPageRedirect();
+        handlePostPageRedirect();
       });
   };
 

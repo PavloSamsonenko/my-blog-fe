@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import "./no-match.css"
 
 const NoMatch = () => {
   return (
-    <div>
+    <div className="no-match-main">
       <h2>Nothing to see here!</h2>
       <p>
         <Link to="/">Go to the home page</Link>
