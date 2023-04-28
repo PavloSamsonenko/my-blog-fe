@@ -163,7 +163,7 @@ export default function PasswordForgotChangePage() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              change password
+              Change password
             </Button>
           </Box>
         </Box>

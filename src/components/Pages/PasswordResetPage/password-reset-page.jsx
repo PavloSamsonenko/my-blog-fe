@@ -7,6 +7,7 @@ import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -16,6 +17,7 @@ import { toast } from "react-toastify";
 const theme = createTheme();
 
 export default function ResetPassword() {
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     email: "",
   });
@@ -48,6 +50,7 @@ export default function ResetPassword() {
   };
 
   const fetchAccountForgetPassword = () => {
+    setLoading(true);
     fetch(`http://localhost:8080/a/rest/accounts/password/forgot`, {
       headers: {
         Accept: "application/json",
@@ -68,7 +71,8 @@ export default function ResetPassword() {
           toast(`Please check your email for next step`);
           handleLoginRedirect();
         }
-      });
+      })
+      .then(() => setLoading(false));
   };
 
   let error = false;
@@ -131,7 +135,11 @@ export default function ResetPassword() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              change password
+              {loading ? (
+                <CircularProgress color="inherit" />
+              ) : (
+                "Change password"
+              )}
             </Button>
             <Grid container>
               <Grid item xs>

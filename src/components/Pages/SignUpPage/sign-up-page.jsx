@@ -9,6 +9,7 @@ import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { toast } from "react-toastify";
@@ -16,6 +17,8 @@ import { toast } from "react-toastify";
 const theme = createTheme();
 
 export default function SignUp() {
+  const [loading, setLoading] = useState(false);
+
   const [errors, setErrors] = useState({
     email: "",
     username: "",
@@ -53,6 +56,7 @@ export default function SignUp() {
   };
 
   const fetchSingIn = () => {
+    setLoading(true);
     fetch("http://localhost:8080/a/rest/accounts/register", {
       headers: {
         Accept: "application/json",
@@ -74,9 +78,12 @@ export default function SignUp() {
           return;
         }
         localStorage.setItem("token", res.authorizationToken);
-        toast(`Account registration complete, please activate it via email instruction`);
+        toast(
+          `Account registration complete, please activate it via email instruction`
+        );
         handleLoginRedirect();
-      });
+      })
+      .then(() => setLoading(false));
   };
 
   let error = false;
@@ -186,7 +193,7 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              {loading ? <CircularProgress color="inherit" /> : " Sign Up"}
             </Button>
             <Grid container>
               <Grid item xs>
