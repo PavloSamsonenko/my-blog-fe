@@ -77,7 +77,6 @@ export default function SignUp() {
           }
           return;
         }
-        localStorage.setItem("token", res.authorizationToken);
         toast(
           `Account registration complete, please activate it via email instruction`
         );
